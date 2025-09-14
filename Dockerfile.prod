@@ -1,0 +1,36 @@
+# Stage 1: Node build
+FROM node:18 AS frontend
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Stage 2: PHP app with assets copied in
+FROM php:8.2-fpm
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    unzip git curl libzip-dev zip libpng-dev libjpeg-dev libfreetype6-dev \
+    libonig-dev libxml2-dev gnupg ca-certificates \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo_mysql zip bcmath opcache pcntl gd
+
+# Adiciona exceção ao Git para evitar erro de "dubious ownership"
+RUN git config --global --add safe.directory /var/www/html
+
+# Instala o Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+# Copia os arquivos do projeto
+COPY . .
+
+# Copia os assets do build do frontend
+COPY --from=frontend /app/public/build /var/www/html/public/build
+
+# Cria o symlink necessário
+WORKDIR /var/www/html/public/sja_assets
+RUN ln -s ../build .

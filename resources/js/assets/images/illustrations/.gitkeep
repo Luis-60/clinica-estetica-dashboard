@@ -1,0 +1,14 @@
+// Exemplo de como usar imagens no layout de autenticação
+
+// Quando você tiver a imagem image-welcome.png, coloque ela em:
+// resources/js/assets/images/illustrations/image-welcome.png
+
+// Então descomente e ajuste o import no auth-simple-layout.tsx:
+// import ImageWelcome from '@/assets/images/illustrations/image-welcome.png';
+
+// E use assim no JSX:
+// <img src={ImageWelcome} alt="Bem-vindo" className="max-w-xs mx-auto" />
+
+// Ou se for um SVG, você pode importar como componente:
+// import { ReactComponent as WelcomeIllustration } from '@/assets/images/illustrations/welcome.svg';
+// <WelcomeIllustration className="max-w-xs mx-auto" />
