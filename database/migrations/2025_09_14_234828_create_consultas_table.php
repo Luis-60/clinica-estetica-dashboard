@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('consultas', function (Blueprint $table) {
             $table->id();
+            $table->integer('paciente_id')->unsigned();
+            $table->foreign('paciente_id')->references('id')->on('pacientes')->
+                onDelete('cascade');
+            $table->datetime('data');
+            $table->varchar('procedimento', 255);
             $table->timestamps();
         });
     }

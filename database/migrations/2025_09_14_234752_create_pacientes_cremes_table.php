@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('pacientes_cremes', function (Blueprint $table) {
             $table->id();
+            $table->integer('pacientes_id')->unsigned();
+            $table->foreign('pacientes_id')->references('id')->on('pacientes')->
+                onDelete('cascade');
+            $table->integer('cremes_ou_locao_id')->unsigned();
+            $table->foreign('cremes_ou_locao_id')->references('id')->on('cremes_ou_locao')
+                ->onDelete('cascade');
+
             $table->timestamps();
         });
     }
