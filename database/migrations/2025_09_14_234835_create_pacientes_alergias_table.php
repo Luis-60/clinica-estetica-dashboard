@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('pacientes_alergias', function (Blueprint $table) {
             $table->id();
-            $table->integer('pacientes_id')->unsigned();
-            $table->foreign('pacientes_id')->references('id')->on('pacientes')
-                ->onDelete('cascade');
-            $table->integer('alergias_id')->unsigned();
+            $table->unsignedBigInteger('pacientes_id');
+            $table->index('pacientes_id');
+            $table->foreign('pacientes_id')->references('id')->on('pacientes')->onDelete('cascade');
+            $table->unsignedBigInteger('alergias_id');
+            $table->index('alergias_id');
             $table->foreign('alergias_id')->references('id')->on('alergias')
                 ->onDelete('cascade');
                 

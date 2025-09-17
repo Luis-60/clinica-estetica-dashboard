@@ -16,9 +16,9 @@ return new class extends Migration
             $table->date('data');
             $table->string('procedimento', 500);
             $table->text('observacoes')->nullable();
-            $table->integer('pacientes_id')->unsigned();
+            $table->unsignedBigInteger('pacientes_id');
+            $table->index('pacientes_id');
             $table->foreign('pacientes_id')->references('id')->on('pacientes')->onDelete('cascade');
-            
             $table->timestamps();
         });
     }

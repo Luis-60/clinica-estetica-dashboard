@@ -29,8 +29,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
-            'senhaHash' => ['required', 'string'],
+            'nome' => ['required', 'string'],
+            'password' => ['required', 'string'],
         ];
     }
 
@@ -44,13 +44,13 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         // Busca o usuário pelo email
-        $user = \App\Models\Usuario::where('email', $this->email)->first();
+        $user = \App\Models\Usuario::where('nome', $this->nome)->first();
 
         // Verifica se usuário existe e se a senha está correta
-        if (!$user || !\Hash::check($this->senhaHash, $user->senhaHash)) {
+        if (!$user || !\Hash::check($this->password, $user->password)) {
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
+                'nome' => __('auth.failed'),
             ]);
         }
 

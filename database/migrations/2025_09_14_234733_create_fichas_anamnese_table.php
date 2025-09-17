@@ -35,6 +35,9 @@ return new class extends Migration
             $table->string('qual_anticoncepcional', 100)->nullable();
             $table->string('tempo_gestante', 100)->nullable();
             $table->text('motivo_estetico')->nullable();
+            $table->unsignedBigInteger('pacientes_id');
+            $table->index('pacientes_id');
+            $table->foreign('pacientes_id')->references('id')->on('pacientes')->onDelete('cascade');
 
             $table->timestamps();
         });

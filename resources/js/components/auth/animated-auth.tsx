@@ -1,15 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useForm } from '@inertiajs/react';
-import { LogIn, LoaderCircle } from 'lucide-react';
+import { useForm, router } from '@inertiajs/react';
+import { LogIn, LoaderCircle, AlertCircle } from 'lucide-react';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 
+
 export default function AnimatedAuth() {
   const loginForm = useForm({
-    email: '',
-    senhaHash: '',
+    nome: '',
+    password: '',
     remember: false,
   });
+
+  // Função para submeter o formulário
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    loginForm.post(route('login'), {
+      onFinish: () => loginForm.reset('password'),
+      onSuccess: () => {
+        // Redirecionar para dashboard após login bem-sucedido
+        router.visit('/dashboard');
+      },
+      onError: (errors) => {
+        console.error('Erro no login:', errors);
+      }
+    });
+  };
 
   // Animação de entrada do card
   const [show, setShow] = useState(false);
@@ -38,26 +55,38 @@ export default function AnimatedAuth() {
           <h2 className="text-3xl font-extrabold text-blue-900 tracking-tight mb-1">Bem-vindo ao Sistema!</h2>
           <p className="text-base text-blue-700/80 mb-2">Faça login para acessar o sistema</p>
         </div>
-        <form className="w-full space-y-6" onSubmit={e => { e.preventDefault(); loginForm.post(route('login'), { onFinish: () => loginForm.reset('senhaHash') }); }}>
+        <form className="w-full space-y-6" onSubmit={handleSubmit}>
+          {/* Mostrar erros de validação */}
+          {(loginForm.errors.nome || loginForm.errors.password) && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center space-x-2">
+              <AlertCircle className="h-4 w-4 text-red-500" />
+              <span className="text-sm text-red-700">
+                {loginForm.errors.nome || loginForm.errors.password || 'Credenciais inválidas'}
+              </span>
+            </div>
+          )}
+          
           <div>
-            <Label htmlFor="email">Usuário</Label>
+            <Label htmlFor="nome">Nome</Label>
             <Input
-              id="email"
-              value={loginForm.data.email}
-              onChange={e => loginForm.setData('email', e.target.value)}
-              placeholder="Digite seu usuário ou email"
+              id="nome"
+              value={loginForm.data.nome}
+              onChange={e => loginForm.setData('nome', e.target.value)}
+              placeholder="Digite seu nome"
               autoFocus
+              className={loginForm.errors.nome ? 'border-red-300' : ''}
             />
           </div>
           <div>
-            <Label htmlFor="senhaHash">Senha</Label>
+            <Label htmlFor="password">Senha</Label>
             <Input
-              id="senhaHash"
+              id="password"
               type="password"
-              value={loginForm.data.senhaHash}
-              onChange={e => loginForm.setData('senhaHash', e.target.value)}
+              value={loginForm.data.password}
+              onChange={e => loginForm.setData('password', e.target.value)}
               placeholder="••••••••"
               autoComplete="current-password"
+              className={loginForm.errors.password ? 'border-red-300' : ''}
             />
           </div>
           <button

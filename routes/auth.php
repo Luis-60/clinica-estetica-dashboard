@@ -17,20 +17,10 @@ use App\Models\Periodo;
 use Inertia\Inertia;
 
 Route::middleware('guest')->group(function () {
-    Route::get('login', [AuthenticatedSessionController::class, 'create'])
-        ->name('login');
     Route::get('login', function () {
-        $instituicoes = Instituicao::get(['id', 'nome']);
-        $cursos = Curso::get(['id', 'nome']);
-        $periodos = Periodo::get(['id', 'nome']);
-
-        return Inertia::render('auth/login', [
-            'instituicoes' => $instituicoes,
-            'cursos' => $cursos,
-            'periodos' => $periodos,
-        ]);
+        return Inertia::render('auth/login');
     })->name('login');
-    Route::post('/register', [RegisteredUserController::class, 'store'])->name('register');
+    
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])

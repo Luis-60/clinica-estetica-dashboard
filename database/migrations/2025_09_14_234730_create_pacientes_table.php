@@ -20,7 +20,8 @@ return new class extends Migration
             $table->enum('sexo', ['masculino', 'feminino']);
             $table->string('rede_social');
             
-            $table->integer('usuarios_id')->unsigned();
+            $table->unsignedBigInteger('usuarios_id');
+            $table->index('usuarios_id');
             $table->foreign('usuarios_id')->references('id')->on('usuarios')->onDelete('cascade');
 
             $table->timestamps();
