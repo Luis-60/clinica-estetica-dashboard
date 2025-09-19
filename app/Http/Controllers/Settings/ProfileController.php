@@ -11,9 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\Artigo;
-use App\Models\Evento;
-use App\Models\ArtigoAutor;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Hash;
 
@@ -84,21 +81,8 @@ class ProfileController extends Controller
 
     public function show(Request $request, $id): Response
     {
-        $user = Usuario::with([
-            'instituicao',
-            'artigos.area',    // Carrega áreas dos artigos
-            'artigos.evento',  // Carrega eventos dos artigos
-        ])
-            ->findOrFail($id);
-
-        // Buscar eventos ativos (não finalizados e data_inicio <= hoje)
-        $eventosAtivos = Evento::where('evento_finalizado', false)
-            ->where('data_inicio', '<=', now())
-            ->orderBy('data_inicio', 'desc')
-            ->get(['id', 'nome', 'seac', 'seget']);
-
-        // Passa eventosAtivos dentro do objeto usuario
-        $user->eventosAtivos = $eventosAtivos;
+        dd($request);
+        $user = Usuario::findOrFail($id);
 
         return Inertia::render('profile/index', [
             'usuario' => $user,
@@ -106,29 +90,6 @@ class ProfileController extends Controller
     }
 
 
-    public function show_articles(): Response
-    {
-        $autores = Usuario::with([
-            'instituicao',
-        ])
-
-            ->get([
-                'id',
-                'nome',
-                'email',
-                'telefone',
-                'instituicoes_id',
-            ]);
-
-        $artigos_autores = ArtigoAutor::with(['artigo', 'autor'])->get();
-        $artigos = Artigo::all();
-
-        return Inertia::render('profile/index', [
-            'artigos_autores' => $artigos_autores,
-            'autores' => $autores,
-            'artigos' => $artigos,
-        ]);
-    }
     /**
      * Delete the user's account.
      */

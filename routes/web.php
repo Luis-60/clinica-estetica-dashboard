@@ -9,10 +9,10 @@ Route::get('/', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
-        
         return Inertia::render('menu', [
         ]);
     })->name('dashboard');
 });
 
 require __DIR__ . '/auth.php';
+require __DIR__ . '/settings.php';

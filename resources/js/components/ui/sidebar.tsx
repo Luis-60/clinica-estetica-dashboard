@@ -542,7 +542,7 @@ function SidebarMenuButton({
   variant = "default",
   size = "default",
   tooltip,
-  className = `hover:text-blue-400 transition-colors duration-200 ease-in-out`,
+  className,
   ...props
 }: React.ComponentProps<"button"> & {
   asChild?: boolean
