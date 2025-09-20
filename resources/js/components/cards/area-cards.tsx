@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Area } from '@/models/Area';
+import { Area } from '@/models/Paciente';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

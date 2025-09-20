@@ -14,8 +14,23 @@ export function AppSidebar() {
     const mainNavItems: NavItem[] = [
         {
             title: 'Dashboard',
-            href: '/dashboard',
+            href: route('dashboard'),
             icon: LayoutGrid,
+        },
+        {
+            title: 'Pacientes',
+            href: '/pacientes',
+            icon: Users,
+        },
+        {
+            title: 'Consultas',
+            href: '/consultas',
+            icon: Calendar,
+        },
+        {
+            title: 'Prontuários',
+            href: '/prontuarios',
+            icon: FileText,
         },
     ];
 
@@ -25,7 +40,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard" prefetch>
+                            <Link href={route('dashboard')} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

@@ -1,6 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import { Area } from '@/models/Area';
+import { Area } from '@/models/Paciente';
 
 interface PageProps extends Record<string, any> {
     areas?: Area[];
