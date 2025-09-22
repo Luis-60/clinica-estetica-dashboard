@@ -84,5 +84,16 @@ final class PacienteController extends Controller
             return redirect()->back()->withErrors(['mensagem' => 'Nenhum paciente encontrado.']);
         }
     }
+    public function show($id): Response
+    {
+        $paciente = Paciente::with(['consultas', 'evolucoes', 'fichasAnamnese'])->findOrFail($id);
+
+        return inertia('paciente/index', [
+            'paciente' => $paciente,
+            'consultas' => $paciente->consultas ?? [],
+            'evolucoes' => $paciente->evolucoes ?? [],
+            'fichas' => $paciente->fichasAnamnese ?? [],
+        ]);
+    }
 }
 

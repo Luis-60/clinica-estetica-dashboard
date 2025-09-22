@@ -19,10 +19,10 @@ export interface NavGroup {
 export interface NavItem {
     title: string;
     href: string;
+    routeName?: string;
     icon?: LucideIcon | null;
     isActive?: boolean;
 }
-
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };

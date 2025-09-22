@@ -1,7 +1,7 @@
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-
+import { Ripple } from 'primereact/ripple';
 interface NavMainProps {
     items?: NavItem[];
     orientador?: NavItem[];
@@ -13,121 +13,47 @@ interface NavMainProps {
 
 export function NavMain({ items = [], avaliador = [], administrador = [], configuracoes = [], orientador = [], coordenador = [] }: NavMainProps) {
     const page = usePage();
-    
+
+    const renderGroup = (label: string, groupItems: NavItem[]) => {
+        if (!groupItems.length) return null;
+
+        return (
+            <SidebarGroup className="px-2 py-0">
+                <SidebarGroupLabel>{label}</SidebarGroupLabel>
+
+                <SidebarMenu>
+                    {groupItems.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = item.routeName
+                            ? route().current(item.routeName)
+                            : page.url.startsWith(item.href);
+
+                        return (
+                            <SidebarMenuItem key={item.title}>
+                                <SidebarMenuButton asChild isActive={isActive} tooltip={{ children: item.title }}>
+                                    <Link href={item.href} prefetch className="relative">
+                                        {Icon && <Icon />}
+                                        <span>{item.title}</span>
+                                        <Ripple style={{ background: 'rgba(0,0,0,0.2' }}/>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        );
+                    })}
+                </SidebarMenu>
+            </SidebarGroup>
+        );
+    };
+
     return (
         <>
-            {/* Grupo principal (Usuário Comum) */}
-            {items.length > 0 && (
-                <SidebarGroup className="px-2 py-0">
-                    <SidebarMenu>
-                        {items.map((item) => (
-                            <SidebarMenuItem key={item.title}>
-                                <SidebarMenuButton asChild isActive={page.url.startsWith(item.href)} tooltip={{ children: item.title }}>
-                                    <Link href={item.href} prefetch>
-                                        {item.icon && <item.icon />}
-                                        <span>{item.title}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        ))}
-                    </SidebarMenu>
-                </SidebarGroup>
-            )}
-
-            {/* Administrador */}
-            {administrador.length > 0 && (
-                <SidebarGroup className="px-2 py-0">
-                    <SidebarGroupLabel>Administrador</SidebarGroupLabel>
-                    <SidebarMenu>
-                        {administrador.map((item) => (
-                            <SidebarMenuItem key={item.title}>
-                                <SidebarMenuButton asChild isActive={page.url.startsWith(item.href)} tooltip={{ children: item.title }}>
-                                    <Link href={item.href} prefetch>
-                                        {item.icon && <item.icon />}
-                                        <span>{item.title}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        ))}
-                    </SidebarMenu>
-                </SidebarGroup>
-            )}
-
-            {/* Grupo Orientadores */}
-            {orientador.length > 0 && (
-                <SidebarGroup className="px-2 py-0">
-                    <SidebarGroupLabel>Orientador</SidebarGroupLabel>
-                    <SidebarMenu>
-                        {orientador.map((item) => (
-                            <SidebarMenuItem key={item.title}>
-                                <SidebarMenuButton asChild isActive={page.url.startsWith(item.href)} tooltip={{ children: item.title }}>
-                                    <Link href={item.href} prefetch>
-                                        {item.icon && <item.icon />}
-                                        <span>{item.title}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        ))}
-                    </SidebarMenu>
-                </SidebarGroup>
-            )}
-
-            {/* Grupo Avaliadores */}
-            {avaliador.length > 0 && (
-                <SidebarGroup className="px-2 py-0">
-                    <SidebarGroupLabel>Avaliador</SidebarGroupLabel>
-                    <SidebarMenu>
-                        {avaliador.map((item) => (
-                            <SidebarMenuItem key={item.title}>
-                                <SidebarMenuButton asChild isActive={page.url.startsWith(item.href)} tooltip={{ children: item.title }}>
-                                    <Link href={item.href} prefetch>
-                                        {item.icon && <item.icon />}
-                                        <span>{item.title}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        ))}
-                    </SidebarMenu>
-                </SidebarGroup>
-            )}
-
-            {/* Grupo Coordenadores */}
-            {coordenador.length > 0 && (
-                <SidebarGroup className="px-2 py-0">
-                    <SidebarGroupLabel>Coordenador</SidebarGroupLabel>
-                    <SidebarMenu>
-                        {coordenador.map((item) => (
-                            <SidebarMenuItem key={item.title}>
-                                <SidebarMenuButton asChild isActive={page.url.startsWith(item.href)} tooltip={{ children: item.title }}>
-                                    <Link href={item.href} prefetch>
-                                        {item.icon && <item.icon />}
-                                        <span>{item.title}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        ))}
-                    </SidebarMenu>
-                </SidebarGroup>
-            )}
-
-            {/* Grupo Configurações */}
-            {configuracoes.length > 0 && (
-                <SidebarGroup className="px-2 py-0">
-                    <SidebarGroupLabel>Configurações</SidebarGroupLabel>
-                    <SidebarMenu>
-                        {configuracoes.map((item) => (
-                            <SidebarMenuItem key={item.title}>
-                                <SidebarMenuButton asChild isActive={page.url.startsWith(item.href)} tooltip={{ children: item.title }}>
-                                    <Link href={item.href} prefetch>
-                                        {item.icon && <item.icon />}
-                                        <span>{item.title}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        ))}
-                    </SidebarMenu>
-                </SidebarGroup>
-            )}
+            {/* Grupo principal */}
+            {renderGroup('Menu', items)}
+            {renderGroup('Administrador', administrador)}
+            {renderGroup('Coordenador', coordenador)}
+            {renderGroup('Orientador', orientador)}
+            {renderGroup('Avaliador', avaliador)}
+            {renderGroup('Configurações', configuracoes)}
         </>
     );
 }

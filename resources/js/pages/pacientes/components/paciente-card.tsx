@@ -3,7 +3,8 @@ import { Paciente } from '@/models/Paciente';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Trash2, Calendar, Phone, MapPin, User, Venus, Mars, Instagram } from 'lucide-react';
+import { Edit, Trash2, Calendar, Phone, MapPin, User, Venus, Mars, Instagram, InstagramIcon } from 'lucide-react';
+import { router } from '@inertiajs/react';
 
 interface PacienteCardProps {
     paciente: Paciente;
@@ -63,11 +64,7 @@ export function PacienteCard({ paciente, onEdit, onDelete }: PacienteCardProps) 
                     <div className="flex items-center gap-2 text-sm">
                         <Phone className="h-3 w-3 text-muted-foreground" />
                         <span className="font-medium">{paciente.telefone}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="h-3 w-3 text-muted-foreground" />
-                        <span className="font-medium">{paciente.endereco}</span>
-                    </div>
+
                     <div className="flex items-center gap-2 text-sm">
                         {paciente.sexo === 'feminino' ? (
                             <Venus className="h-3 w-3 text-pink-500" />
@@ -76,15 +73,23 @@ export function PacienteCard({ paciente, onEdit, onDelete }: PacienteCardProps) 
                         )}
                         <span className="font-medium capitalize">{paciente.sexo}</span>
                     </div>
+                    </div>
                     <div className="flex items-center gap-2 text-sm">
-                        <Instagram className="h-3 w-3 text-purple-500" />
+                        <MapPin className="h-3 w-3 text-muted-foreground" />
+                        <span className="font-medium">{paciente.endereco}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                        <InstagramIcon className="h-3 w-3 text-purple-500" />
                         <span className="font-medium">{paciente.rede_social}</span>
                     </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
-                        Paciente Ativo
-                    </Badge>
+                    <Button
+                        variant="default"
+                        size="sm"
+                        className="w-full mt-2"
+                        onClick={() => router.visit(`/paciente/${paciente.id}`)}
+                    >
+                        Acessar Perfil
+                    </Button>
                 </div>
             </CardContent>
         </Card>

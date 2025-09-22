@@ -51,7 +51,7 @@ export default function PacientesIndex({ pacientes = [] }: PacientesIndexProps) 
     const pacientesFemininos = pacientes.filter(p => p.sexo === 'feminino').length;
     
     // Pacientes cadastrados este mês (mockado para demonstração)
-    const pacientesEsteMes = Math.floor(totalPacientes * 0.2);
+    const pacientesEsteMes = Math.floor(totalPacientes * 1);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

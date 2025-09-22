@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\PacienteController;
+use App\Http\Controllers\FichaAnamneseController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -19,6 +20,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/pacientes', 'store')->name('pacientes.store');
         Route::put('/pacientes', 'update')->name('pacientes.update');
         Route::delete('/pacientes/{id}', 'destroy')->name('pacientes.destroy');
+        Route::get('paciente/{id}', 'show')->name('paciente.show');
+    });
+    Route::controller(FichaAnamneseController::class)->group(function () {
+        Route::post('/fichas', 'store')->name('fichas.store');
+        Route::put('/fichas/{id}', 'update')->name('fichas.update');
+        Route::get('/fichas/{id}', 'show')->name('fichas.show');
     });
 });
 
