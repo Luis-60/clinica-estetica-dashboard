@@ -36,14 +36,42 @@ const formatDate = (value: string) => {
 }
 
 const strToDate = (value: string): Date => {
-    const [day, month, year] = value.split('/').map(Number);
-    return new Date(year, month - 1, day); // month is 0-based in JS Date
+    if (!value || value.trim() === '') {
+        return new Date(); // Retorna data atual se string estiver vazia
+    }
+    
+    const parts = value.split('/');
+    if (parts.length !== 3) {
+        return new Date(); // Retorna data atual se formato estiver incorreto
+    }
+    
+    const [day, month, year] = parts.map(Number);
+    
+    // Verificar se os valores são números válidos
+    if (isNaN(day) || isNaN(month) || isNaN(year)) {
+        return new Date(); // Retorna data atual se algum valor for inválido
+    }
+    
+    const date = new Date(year, month - 1, day); // month is 0-based in JS Date
+    
+    // Verificar se a data criada é válida
+    if (isNaN(date.getTime())) {
+        return new Date(); // Retorna data atual se a data for inválida
+    }
+    
+    return date;
 };
 
 const laravelDateFormat = (datetimeStr: string | undefined) => {
-    if (!datetimeStr) { return '' };
+    if (!datetimeStr || datetimeStr.trim() === '') { return '' };
     const [datePart] = datetimeStr.split(' ');
     const [year, month, day] = datePart.split('-');
+    
+    // Verificar se todas as partes da data são válidas
+    if (!year || !month || !day || isNaN(Number(year)) || isNaN(Number(month)) || isNaN(Number(day))) {
+        return '';
+    }
+    
     return `${day}/${month}/${year}`;
 }
 
@@ -53,31 +81,33 @@ export function DatePicker({ value, onChange, minDate, maxDate }: Props) {
     const [month, setMonth] = React.useState(new Date());
     const [txtDate, setTxtDate] = React.useState<string>(laravelDateFormat(value?.toString()));
 
-
-    //atualiza txt de Data quanto data muda
+    // Sincroniza com o valor externo quando ele muda
     useEffect(() => {
-        if (!date) return;
-        console.log(date);
-
-        setTxtDate(date.toLocaleDateString('en-GB'))
-    }, [date])
+        setTxtDate(laravelDateFormat(value?.toString()));
+    }, [value]);
 
     useEffect(() => {
         if (txtDate == '') {
             setMonth(new Date());
             setDate(undefined);
+            onChange?.(undefined);
             return
         }
 
-        const finalDate = new Date(strToDate(txtDate));
-
-        setMonth(finalDate);
-        if (minDate && finalDate < minDate) {
-            return;
-
+        // Só processa se a data estiver completa (formato DD/MM/YYYY)
+        if (txtDate.length === 10 && txtDate.split('/').length === 3) {
+            const finalDate = strToDate(txtDate);
+            
+            // Só atualiza se a data for válida
+            if (!isNaN(finalDate.getTime())) {
+                setMonth(finalDate);
+                if (minDate && finalDate < minDate) {
+                    return;
+                }
+                setDate(finalDate);
+                onChange?.(finalDate);
+            }
         }
-        setDate(finalDate);
-        onChange?.(finalDate);
     }, [txtDate])
 
     const handleDate = (value: string) => {
@@ -88,11 +118,23 @@ export function DatePicker({ value, onChange, minDate, maxDate }: Props) {
 
     return (
         <div className="flex flex-col gap-3" >
-            <Popover modal={true} open={open} onOpenChange={setOpen}>
-                <PopoverTrigger>
-                    <Input inputIcon={<CalendarIcon className="size-5" />} value={txtDate} onChange={(e) => handleDate(e.target.value)} placeholder={new Date().toLocaleDateString('en-GB')} />
+            <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                    <div>
+                        <Input 
+                            inputIcon={<CalendarIcon className="size-5 cursor-pointer" onClick={() => setOpen(true)} />} 
+                            value={txtDate} 
+                            onChange={(e) => handleDate(e.target.value)} 
+                            placeholder={new Date().toLocaleDateString('en-GB')}
+                        />
+                    </div>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto overflow-hidden p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()} onCloseAutoFocus={(e) => e.preventDefault()}>
+                <PopoverContent 
+                    className="w-auto overflow-hidden p-0" 
+                    align="start" 
+                    onOpenAutoFocus={(e) => e.preventDefault()} 
+                    onCloseAutoFocus={(e) => e.preventDefault()}
+                >
                     <Calendar
                         endMonth={new Date((new Date().getFullYear() + 20), 0)}
                         className="bg-card"

@@ -1,18 +1,21 @@
+import { DatePicker } from "@/components/manual/date-picker";
 import Field from "@/components/manual/field";
 import ModalBase from "@/components/manual/modal-base";
 import SubmitButton from "@/components/manual/submit-button";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { applyTelMask } from "@/lib/TelMask";
 import { Paciente } from "@/models/Paciente";
 import { useForm } from "@inertiajs/react";
-import { useEffect } from "react";
+import { set } from "date-fns";
 
+import { useEffect } from "react";
 interface Props {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   dado: Paciente | null;
 }
-
 export default function ModalCriar({ open, setOpen, dado }: Props) {
   useEffect(() => {
     if (open === false) {
@@ -32,27 +35,26 @@ export default function ModalCriar({ open, setOpen, dado }: Props) {
       rede_social: dado?.rede_social ?? "",
     };
   }
-
   const { data, setData, post, put, processing, errors, clearErrors, reset } =
-    useForm<
-      Required<{
-        id: number;
-        nome: string;
-        data_nasc: string;
-        endereco: string;
-        telefone: string;
-        sexo: "masculino" | "feminino";
-        rede_social: string;
-      }>
-    >(newForm());
-
+  useForm<
+  Required<{
+    id: number;
+    nome: string;
+    data_nasc: string;
+    endereco: string;
+    telefone: string;
+    sexo: "masculino" | "feminino";
+    rede_social: string;
+  }>
+  >(newForm());
+  
   useEffect(() => {
     setData(newForm());
   }, [dado]);
-
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     if (data.id !== 0) {
       put(route("pacientes.update", data.id), {
         preserveScroll: true,
@@ -65,7 +67,7 @@ export default function ModalCriar({ open, setOpen, dado }: Props) {
       });
       return;
     }
-
+    
     post(route("pacientes.store"), {
       preserveScroll: true,
       onSuccess: () => {
@@ -76,7 +78,8 @@ export default function ModalCriar({ open, setOpen, dado }: Props) {
       },
     });
   };
-
+  
+  console.log(data);
   return (
     <ModalBase 
       open={open} 
@@ -94,16 +97,18 @@ export default function ModalCriar({ open, setOpen, dado }: Props) {
             errors={errors.nome}
             placeholder="Digite o nome completo do paciente"
           />
-          
-          <Field
-            label="Data de Nascimento"
-            type="date"
-            value={data.data_nasc}
-            onChange={(e) => {
-              setData({ ...data, data_nasc: e.target.value });
-            }}
-            errors={errors.data_nasc}
-          />
+          <Label>
+          Data de Nascimento
+          </Label>
+          <DatePicker
+              value={data.data_nasc}
+              onChange={(date) => {
+                if (date instanceof Date && !isNaN(date.getTime())) {
+                  const dateString = date.toISOString().split("T")[0];
+                  setData({ ...data, data_nasc: dateString });
+                }
+              }}
+            />
 
           <Field
             label="Endereço"
@@ -119,7 +124,7 @@ export default function ModalCriar({ open, setOpen, dado }: Props) {
             label="Telefone"
             value={data.telefone}
             onChange={(e) => {
-              setData({ ...data, telefone: e.target.value });
+              setData({ ...data, telefone: applyTelMask(e.target.value) });
             }}
             errors={errors.telefone}
             placeholder="(00) 00000-0000"
@@ -137,34 +142,20 @@ export default function ModalCriar({ open, setOpen, dado }: Props) {
 
           <Field label="Sexo" errors={errors.sexo}>
             <div className="flex gap-6 mt-2">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  id="feminino"
-                  name="sexo"
-                  value="feminino"
-                  checked={data.sexo === "feminino"}
-                  onChange={(e) => {
-                    setData({ ...data, sexo: e.target.value as "masculino" | "feminino" });
-                  }}
-                  className="w-4 h-4"
-                />
-                <Label htmlFor="feminino">Feminino</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  id="masculino"
-                  name="sexo"
-                  value="masculino"
-                  checked={data.sexo === "masculino"}
-                  onChange={(e) => {
-                    setData({ ...data, sexo: e.target.value as "masculino" | "feminino" });
-                  }}
-                  className="w-4 h-4"
-                />
-                <Label htmlFor="masculino">Masculino</Label>
-              </div>
+                <RadioGroup 
+                  className="flex gap-6" 
+                  value={data.sexo}
+                  onValueChange={(value) => setData({ ...data, sexo: value as "masculino" | "feminino" })}
+                >
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="masculino" id="masculino" />
+                    <Label htmlFor="masculino">Masculino</Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="feminino" id="feminino" />
+                    <Label htmlFor="feminino">Feminino</Label>
+                  </div>
+                </RadioGroup>
             </div>
           </Field>
         </div>

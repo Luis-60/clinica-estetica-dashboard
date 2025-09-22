@@ -21,49 +21,58 @@ final class PacienteController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nome' => 'required|string',
+            'nome' => 'required|string|max:255',
+            'data_nasc' => 'required|date',
+            'endereco' => 'required|string|max:500',
+            'telefone' => 'required|string|max:20',
             'sexo' => 'required|string|in:masculino,feminino',
-            'data_nascimento' => 'required|date',
-            'email' => 'required|email',
-            'telefone' => 'required|string',
+            'rede_social' => 'nullable|string|max:255',
         ]);
+
         try {
             $paciente = Paciente::create([
-                'nome' => $request->nome,
-                'sexo' => $request->sexo,
-                'data_nascimento' => $request->data_nascimento,
-                'email' => $request->email,
-                'telefone' => $request->telefone,
+                'nome' => $validated['nome'],
+                'data_nasc' => $validated['data_nasc'],
+                'endereco' => $validated['endereco'],
+                'telefone' => $validated['telefone'],
+                'sexo' => $validated['sexo'],
+                'rede_social' => $validated['rede_social'],
+                'usuarios_id' => auth()->id(), // Associa ao usuário logado
             ]);
-        } catch (\Throwable $th) {
-            return redirect()->back()->withErrors(['mensagem' => 'Erro ao tentar adicionar Paciente!']);
-        }
 
-        return redirect()->back()->with('success', 'Paciente adicionado com sucesso!');
+            return redirect()->back()->with('success', 'Paciente cadastrado com sucesso!');
+        } catch (\Throwable $th) {
+            return redirect()->back()->withErrors(['mensagem' => 'Erro ao tentar cadastrar paciente: ' . $th->getMessage()]);
+        }
     }
 
     public function update(Request $request)
     {
         $validated = $request->validate([
-            'nome' => 'required|string',
+            'id' => 'required|integer|exists:pacientes,id',
+            'nome' => 'required|string|max:255',
+            'data_nasc' => 'required|date',
+            'endereco' => 'required|string|max:500',
+            'telefone' => 'required|string|max:20',
             'sexo' => 'required|string|in:masculino,feminino',
-            'data_nascimento' => 'required|date',
-            'email' => 'required|email',
-            'telefone' => 'required|string',
+            'rede_social' => 'nullable|string|max:255',
         ]);
-        try {
-            $paciente = Paciente::findOrFail($request->id)->update([
-                'nome' => $request->nome,
-                'sexo' => $request->sexo,
-                'data_nascimento' => $request->data_nascimento,
-                'email' => $request->email,
-                'telefone' => $request->telefone,
-            ]);
-        } catch (\Throwable $th) {
-            return redirect()->back()->withErrors(['mensagem' => 'Erro ao tentar alterar Paciente!']);
-        }
 
-        return redirect()->back()->with('success', 'Paciente alterado com sucesso!');
+        try {
+            $paciente = Paciente::findOrFail($validated['id']);
+            $paciente->update([
+                'nome' => $validated['nome'],
+                'data_nasc' => $validated['data_nasc'],
+                'endereco' => $validated['endereco'],
+                'telefone' => $validated['telefone'],
+                'sexo' => $validated['sexo'],
+                'rede_social' => $validated['rede_social'],
+            ]);
+
+            return redirect()->back()->with('success', 'Paciente atualizado com sucesso!');
+        } catch (\Throwable $th) {
+            return redirect()->back()->withErrors(['mensagem' => 'Erro ao tentar atualizar paciente: ' . $th->getMessage()]);
+        }
     }
 
     public function destroy($id): RedirectResponse

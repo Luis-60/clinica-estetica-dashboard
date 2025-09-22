@@ -6,7 +6,7 @@ import { createRoot } from 'react-dom/client';
 import { route } from 'ziggy-js';
 import { initializeTheme } from './hooks/use-appearance';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'Clinica Estetica';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
