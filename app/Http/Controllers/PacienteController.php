@@ -79,7 +79,7 @@ final class PacienteController extends Controller
     {
         $deleted = Paciente::where('id', $id)->delete();
         if ($deleted) {
-            return redirect()->back()->with('success', 'Paciente removido com sucesso!');
+            return redirect()->route('pacientes.index')->with('success', 'Paciente removido com sucesso!');
         } else {
             return redirect()->back()->withErrors(['mensagem' => 'Nenhum paciente encontrado.']);
         }

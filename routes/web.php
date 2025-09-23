@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\PacienteController;
+use App\Http\Controllers\EvolucaoController;
 use App\Http\Controllers\FichaAnamneseController;
 
 Route::get('/', function () {
@@ -22,6 +23,12 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/pacientes/{id}', 'destroy')->name('pacientes.destroy');
         Route::get('paciente/{id}', 'show')->name('paciente.show');
     });
+    Route::controller(EvolucaoController::class)->group(function () {
+        Route::post('/evolucoes', 'store')->name('evolucoes.store');
+        Route::put('/evolucoes/{id}', 'update')->name('evolucoes.update');
+        Route::delete('/evolucoes/{id}', 'destroy')->name('evolucoes.destroy');
+    });
+
     Route::controller(FichaAnamneseController::class)->group(function () {
         Route::post('/fichas', 'store')->name('fichas.store');
         Route::put('/fichas/{id}', 'update')->name('fichas.update');

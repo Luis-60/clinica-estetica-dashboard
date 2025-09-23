@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, Users, Calendar, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Paciente } from '@/models/Paciente';
+import { confirmDialog } from '@/components/manual/dialog-events';
 
 interface PacientesIndexProps {
     pacientes: Paciente[];
@@ -28,12 +29,21 @@ export default function PacientesIndex({ pacientes = [] }: PacientesIndexProps) 
         setPacienteSelecionado(paciente);
         setIsCreateModalOpen(true);
     };
+  const handleDelete = (id: number) => {
+    confirmDialog({
+      title: "Excluir Paciente",
+      text: "Tem certeza que deseja deletar o paciente?",
+      onConfirm: (resolve) => {
+        router.delete(route("pacientes.destroy", id), {
+          preserveScroll: true,
+          onFinish: () => {
+            resolve();
+          },
+        });
+      },
+    });
+  };
 
-    const handleDelete = (id: number) => {
-        if (confirm('Tem certeza que deseja excluir este paciente?')) {
-            router.delete(`/pacientes/${id}`);
-        }
-    };
 
     const handleCreateNew = () => {
         setPacienteSelecionado(null);

@@ -13,7 +13,7 @@ import {
   FileIcon
 } from "lucide-react";
 
-const trueColorDefault = "bg-blue-500";
+const trueColorDefault = "bg-green-300";
 
 interface Props {
   fichas: FichaAnamnese[];
@@ -33,7 +33,7 @@ const FieldIndicator: React.FC<IndicatorProps> = ({
   value, 
   label, 
   trueColor, 
-  falseColor = "bg-red-500" 
+  falseColor = "bg-red-300" 
 }) => (
   <div className="flex items-center gap-2">
     <span className={`h-2 w-2 rounded-full ${value ? trueColor : falseColor}`}></span>

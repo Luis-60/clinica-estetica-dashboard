@@ -102,7 +102,6 @@ export default function FichaAnamneseCard({
                 <div className="space-y-2">
                   <Label>Usa lentes de contato?</Label>
                   <RadioGroup
-                    className="flex"
                     value={data.lente_contato.toString()}
                     onValueChange={(value) => handleBooleanChange("lente_contato", value)}
                   >

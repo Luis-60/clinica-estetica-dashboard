@@ -36,6 +36,7 @@ export function PacienteCard({ paciente, onEdit, onDelete }: PacienteCardProps) 
                                 <span className="text-sm text-muted-foreground">
                                     Nasc.: {formatDate(paciente.data_nasc)}
                                 </span>
+                                
                             </div>
                         </div>
                     </div>
@@ -52,7 +53,7 @@ export function PacienteCard({ paciente, onEdit, onDelete }: PacienteCardProps) 
                             variant="ghost"
                             size="sm"
                             onClick={() => onDelete(paciente.id)}
-                            className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
                         >
                             <Trash2 className="h-4 w-4" />
                         </Button>
