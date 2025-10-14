@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\EvolucaoController;
 use App\Http\Controllers\FichaAnamneseController;
+use App\Http\Controllers\ConsultaController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -27,6 +28,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/evolucoes', 'store')->name('evolucoes.store');
         Route::put('/evolucoes/{id}', 'update')->name('evolucoes.update');
         Route::delete('/evolucoes/{id}', 'destroy')->name('evolucoes.destroy');
+    });
+
+    Route::controller(ConsultaController::class)->group(function () {
+        Route::get('/consultas', 'index')->name('consultas.index');
+        Route::post('/consultas', 'store')->name('consultas.store');
+        Route::put('/consultas/{id}', 'update')->name('consultas.update');
+        Route::delete('/consultas/{id}', 'destroy')->name('consultas.destroy');
     });
 
     Route::controller(FichaAnamneseController::class)->group(function () {

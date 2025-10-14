@@ -12,7 +12,7 @@ class Consulta extends Model
     protected $fillable = [
         'pacientes_id',
         'data',
-        'procedimento',
+        'procedimento'
     ];
 
     public function paciente()

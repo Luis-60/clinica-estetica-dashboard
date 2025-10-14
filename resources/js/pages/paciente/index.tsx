@@ -361,7 +361,6 @@ export default function PacienteShow({
               </AccordionTrigger>
               <AccordionContent>
                 <div className="flex justify-between items-center mb-4">
-                  <div></div>
                   <Button
                     onClick={() => setFichaCardOpen(true)}
                     variant="default"
