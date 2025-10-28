@@ -37,50 +37,48 @@ export default function ConsultasPage({ pacientes = [], consultas = [] }: { paci
       cell: ({ row }: any) => row.original.paciente?.nome || "-",
     },
     {
-      accessorKey: "data_consulta",
+      accessorKey: "data",
       header: "Data",
       cell: ({ row }: any) =>
-        row.original.data_consulta
-          ? format(new Date(row.original.data_consulta), "dd/MM/yyyy")
+        row.original.data
+          ? format(new Date(row.original.data), "dd/MM/yyyy")
           : "-",
     },
     {
       accessorKey: "horario",
       header: "Horário",
-      cell: (info: any) => info.getValue(),
+        cell: ({ row }: any) =>
+          row.original?.data
+            ? format(new Date(row.original.data), "HH:mm")
+            : "-",
     },
     {
       accessorKey: "procedimento",
       header: "Procedimento",
       cell: (info: any) => info.getValue(),
     },
-    {
-      accessorKey: "observacoes",
-      header: "Observações",
-      cell: (info: any) => info.getValue(),
-    },
-    {
-      id: "actions",
-      header: "Ações",
-      cell: ({ row }: any) => (
-        <Link href={route("consultas.show", row.original.id)}>
-          <Button size="sm" variant="outline">Ver</Button>
-        </Link>
-      ),
-    },
+    // {
+    //   id: "actions",
+    //   header: "Ações",
+    //   cell: ({ row }: any) => (
+    //     <Link href={route("consultas.show", row.original.id)}>
+    //       <Button size="sm" variant="outline">Ver</Button>
+    //     </Link>
+    //   ),
+    // },
   ];
 
   return (
     <AppLayout>
       <Head title="Marcação de Consultas" />
-      <div className="p-4 container mx-auto">
+      <div className="p-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Consultas</h1>
           <Button onClick={() => setModalOpen(true)}>Nova Consulta</Button>
         </div>
 
         {/* Tabela de consultas */}
-        <DataTable columns={columns} data={consultas} />
+       <DataTable columns={columns} data={consultas} />
 
         <ModalCriarConsulta
           open={modalOpen}

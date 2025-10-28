@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Consulta;
 use Illuminate\Http\Request;
 use Inertia\Response;
+use Carbon\Carbon;
 
 class ConsultaController extends Controller
 {
@@ -18,24 +19,44 @@ class ConsultaController extends Controller
             'pacientes' => $pacientes,
         ]);
     }
-
+    
     public function store(Request $request)
     {
+        // Log incoming request for debugging
+        \Log::info('ConsultaController@store input', $request->all());
+
         $validated = $request->validate([
             'pacientes_id' => 'required|exists:pacientes,id',
             'data'        => 'required|date',
             'procedimento'=> 'required|string|max:255',
         ]);
 
+        // Normalize incoming datetime (ISO with Z / milliseconds) to MySQL DATETIME format
         try {
-            Consulta::create($validated);
-            return redirect()->back()->with('success', 'Consulta marcada com sucesso!');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withErrors(['error' => 'Erro ao salvar consulta: ' . $e->getMessage()])
-                ->withInput();
+            if (!empty($validated['data'])) {
+                // Carbon can parse ISO formats with timezone designator
+                $dt = Carbon::parse($validated['data']);
+                // Format as 'Y-m-d H:i:s' (MySQL DATETIME)
+                $validated['data'] = $dt->format('Y-m-d H:i:s');
+            }
+
+            $consulta = Consulta::create([
+                'pacientes_id' => $validated['pacientes_id'],
+                'data' => $validated['data'],
+                'procedimento' => $validated['procedimento'],
+            ]);
+
+        } catch (\Throwable $th) {
+            // Log exception details
+            \Log::error('ConsultaController@store error', ['message' => $th->getMessage(), 'trace' => $th->getTraceAsString(), 'input' => $request->all()]);
+
+            return redirect()->back()->withErrors(['mensagem' => 'Erro ao tentar adicionar Consulta: ' . $th->getMessage()]);
         }
+
+        return redirect()->back()->with('success', 'Consulta adicionada com sucesso!');
     }
+
+
 
     public function show($id): Response
     {
