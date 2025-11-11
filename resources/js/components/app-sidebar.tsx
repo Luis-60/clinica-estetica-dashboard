@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Users, Calendar, FileText, Settings, User } from 'lucide-react';
+import { LayoutGrid, Users, Calendar, FileText, Settings, User, Scissors, Pill } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
@@ -28,9 +28,14 @@ export function AppSidebar() {
             icon: Calendar,
         },
         {
-            title: 'Prontuários',
-            href: '/prontuarios',
-            icon: FileText,
+            title: 'Procedimentos',
+            href: '/procedimentos',
+            icon: Scissors,
+        },
+        {
+            title: 'Medicamentos',
+            href: '/medicamentos',
+            icon: Pill,
         },
     ];
 

@@ -5,6 +5,7 @@ import { DataTable } from "@/components/manual/data-table";
 import { format } from "date-fns";
 import AppLayout from "@/layouts/app-layout";
 import ModalCriarConsulta from "./components/modal-criar-consulta";
+import AcoesConsulta from "./components/acoes-consulta";
 
 interface Paciente {
   id: number;
@@ -21,7 +22,15 @@ interface Consulta {
   created_at: string;
 }
 
-export default function ConsultasPage({ pacientes = [], consultas = [] }: { pacientes?: Paciente[]; consultas?: Consulta[] }) {
+export default function ConsultasPage({
+  pacientes = [],
+  consultas = [],
+  procedimentos = [],
+}: {
+  pacientes?: Paciente[];
+  consultas?: Consulta[];
+  procedimentos?: any[];
+}) {
   const [modalOpen, setModalOpen] = useState(false);
 
   // Definição das colunas da tabela
@@ -47,25 +56,23 @@ export default function ConsultasPage({ pacientes = [], consultas = [] }: { paci
     {
       accessorKey: "horario",
       header: "Horário",
-        cell: ({ row }: any) =>
-          row.original?.data
-            ? format(new Date(row.original.data), "HH:mm")
-            : "-",
+      cell: ({ row }: any) =>
+        row.original?.data ? format(new Date(row.original.data), "HH:mm") : "-",
     },
     {
-      accessorKey: "procedimento",
+      accessorKey: "procedimento.nome",
       header: "Procedimento",
-      cell: (info: any) => info.getValue(),
+      cell: ({ row }: any) => row.original.procedimento?.nome || "-",
     },
-    // {
-    //   id: "actions",
-    //   header: "Ações",
-    //   cell: ({ row }: any) => (
-    //     <Link href={route("consultas.show", row.original.id)}>
-    //       <Button size="sm" variant="outline">Ver</Button>
-    //     </Link>
-    //   ),
-    // },
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }: any) => (
+        <div className="flex gap-1 justify-end">
+          <AcoesConsulta consulta={row.original} />
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -78,15 +85,14 @@ export default function ConsultasPage({ pacientes = [], consultas = [] }: { paci
         </div>
 
         {/* Tabela de consultas */}
-       <DataTable columns={columns} data={consultas} />
+        <DataTable columns={columns} data={consultas} />
 
         <ModalCriarConsulta
           open={modalOpen}
           setOpen={setModalOpen}
           pacientes={pacientes}
+          procedimentos={procedimentos}
         />
-
-        
       </div>
     </AppLayout>
   );

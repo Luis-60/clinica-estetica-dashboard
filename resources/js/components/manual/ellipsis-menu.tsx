@@ -1,52 +1,41 @@
-"use client";
-
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import { EllipsisVerticalIcon } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import * as Popover from '@radix-ui/react-popover';
 
-export function EllipsisMenu({ open, setOpen, children, className }: { open: boolean , setOpen: React.Dispatch<React.SetStateAction<boolean>>; children: React.ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  // Fecha ao clicar fora
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    if (open) document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [open]);
-
-  return (
-    <div className="relative inline-block" ref={ref}>
-      {/* Botão trigger */}
-    <button
-        onClick={() => setOpen((prev) => !prev)}
-        className={`p-1 h-8 w-8 rounded-xl flex items-center justify-center
-                    hover:bg-gray-200 dark:hover:bg-neutral-700 cursor-pointer ${className}`}
-        >
-        <EllipsisVerticalIcon className="h-5 w-5" />
-    </button>
-
-      {/* Dropdown animado */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: -5 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -5 }}
-            transition={{ duration: 0.2 }}
-            className="absolute p-1 right-0 md:left-0 z-99 mt-2 w-48 rounded-xl shadow-lg bg-white text-neutral-900 dark:bg-neutral-900 dark:text-white"
-          >
-            <EllipsisDropdown>{children}</EllipsisDropdown>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+interface EllipsisMenuProps {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  children: React.ReactNode;
+  className?: string;
 }
 
+export function EllipsisMenu({ open, setOpen, children, className }: EllipsisMenuProps) {
+  return (
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger asChild>
+        <button
+          className={`p-1 h-8 w-8 rounded-xl flex items-center justify-center
+          hover:bg-gray-200/40 dark:hover:bg-neutral-800/40 cursor-pointer ${className || ''} transition duration-500`}
+        >
+          <EllipsisVerticalIcon className="h-5 w-5" />
+        </button>
+      </Popover.Trigger>
+
+      <Popover.Portal>
+        <Popover.Content
+          className="z-50 rounded-md border bg-popover p-1 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 w-48"
+          sideOffset={5}
+          align="end"
+          alignOffset={-5}
+        >
+          <div className="flex flex-col">
+            {children}
+          </div>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}
 
 // Container para o conteúdo do dropdown
 export function EllipsisDropdown({ children }: { children: React.ReactNode }) {

@@ -11,12 +11,14 @@ class ConsultaController extends Controller
 {
     public function index(): Response
     {
-        $consultas = Consulta::with('paciente')->latest()->get();
+        $consultas = Consulta::with(['paciente', 'procedimento'])->latest()->get();
         $pacientes = \App\Models\Paciente::all();
+        $procedimentos = \App\Models\Procedimento::all();
 
         return inertia('consultas/index', [
             'consultas' => $consultas,
             'pacientes' => $pacientes,
+            'procedimentos' => $procedimentos,
         ]);
     }
     
@@ -28,7 +30,7 @@ class ConsultaController extends Controller
         $validated = $request->validate([
             'pacientes_id' => 'required|exists:pacientes,id',
             'data'        => 'required|date',
-            'procedimento'=> 'required|string|max:255',
+            'procedimento_id'   => 'required|exists:procedimentos,id',
         ]);
 
         // Normalize incoming datetime (ISO with Z / milliseconds) to MySQL DATETIME format
@@ -43,7 +45,7 @@ class ConsultaController extends Controller
             $consulta = Consulta::create([
                 'pacientes_id' => $validated['pacientes_id'],
                 'data' => $validated['data'],
-                'procedimento' => $validated['procedimento'],
+                'procedimentos_id' => $validated['procedimento_id'],
             ]);
 
         } catch (\Throwable $th) {
@@ -73,7 +75,7 @@ class ConsultaController extends Controller
             'paciente_id'   => 'required|exists:pacientes,id',
             'data_consulta' => 'required|date',
             'horario'       => 'required|string|max:10',
-            'procedimento'  => 'required|string|max:255',
+            'procedimento_id'   => 'required|exists:procedimentos,id',
             'observacoes'   => 'nullable|string|max:1000',
         ]);
 

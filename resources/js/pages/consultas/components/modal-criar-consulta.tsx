@@ -15,9 +15,10 @@ interface Props {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   pacientes: Paciente[];
+  procedimentos: any[];
 }
 
-export default function ModalCriarConsulta({ open, setOpen, pacientes }: Props) {
+export default function ModalCriarConsulta({ open, setOpen, pacientes, procedimentos }: Props) {
   // local separate fields for date and time to avoid DatePicker issues
   const [dateStr, setDateStr] = useState<string>("");
   const [timeStr, setTimeStr] = useState<string>("");
@@ -25,7 +26,7 @@ export default function ModalCriarConsulta({ open, setOpen, pacientes }: Props) 
   const { data, setData, post, processing, errors, reset } = useForm({
     pacientes_id: "",
     data: "",
-    procedimento: "",
+    procedimento_id: "",
   });
 
   useEffect(() => {
@@ -66,11 +67,29 @@ export default function ModalCriarConsulta({ open, setOpen, pacientes }: Props) 
       },
     });
   };
+  console.log(data);
 
   return (
     <ModalBase open={open} setOpen={setOpen} titulo="Nova Consulta">
       <form onSubmit={handleSubmit}>
         <div className="grid gap-4">
+          <Field label="Procedimento">
+            <select
+              className="w-full rounded border px-2 py-1"
+              value={data.procedimento_id}
+              onChange={(e) => setData("procedimento_id", e.target.value)}
+            >
+              <option value="">Selecione o procedimento...</option>
+              {procedimentos.map((proc: any) => (
+                <option key={proc.id ?? proc.nome} value={proc.id}>
+                  {proc.nome}
+                </option>
+              ))}
+            </select>
+            {errors.procedimento_id && (
+              <div className="text-destructive text-sm">{errors.procedimento_id}</div>
+            )}
+          </Field>
           <Field label="Paciente">
             <select
               className="w-full rounded border px-2 py-1"
@@ -86,18 +105,6 @@ export default function ModalCriarConsulta({ open, setOpen, pacientes }: Props) 
             </select>
             {errors.pacientes_id && (
               <div className="text-destructive text-sm">{errors.pacientes_id}</div>
-            )}
-          </Field>
-
-          <Field label="Procedimento">
-            <input
-              className="w-full rounded border px-2 py-1"
-              value={data.procedimento}
-              onChange={(e) => setData("procedimento", e.target.value)}
-              placeholder="Digite o procedimento"
-            />
-            {errors.procedimento && (
-              <div className="text-destructive text-sm">{errors.procedimento}</div>
             )}
           </Field>
 

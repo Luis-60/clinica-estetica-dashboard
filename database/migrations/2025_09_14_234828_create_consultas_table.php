@@ -17,7 +17,9 @@ return new class extends Migration
             $table->index('pacientes_id');
             $table->foreign('pacientes_id')->references('id')->on('pacientes')->onDelete('cascade');
             $table->datetime('data');
-            $table->string('procedimento', 255);
+            $table->unsignedBigInteger('procedimentos_id');
+            $table->index('procedimentos_id');
+            $table->foreign('procedimentos_id')->references('id')->on('procedimentos')->onDelete('cascade');
             $table->timestamps();
         });
     }
