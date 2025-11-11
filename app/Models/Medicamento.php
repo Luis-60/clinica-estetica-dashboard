@@ -18,12 +18,12 @@ class Medicamento extends Model
         'marcas_id',
     ];
 
-    public function marca()
+    public function marcas()
     {
         return $this->belongsTo(MarcaMedicamento::class, 'marcas_id');
     }
 
-    public function categoria()
+    public function categorias()
     {
         return $this->belongsTo(CategoriaMedicamento::class, 'categorias_id');
     }

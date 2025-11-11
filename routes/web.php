@@ -5,6 +5,8 @@ use Inertia\Inertia;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\EvolucaoController;
 use App\Http\Controllers\MedicamentoController;
+use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\FichaAnamneseController;
 use App\Http\Controllers\ConsultaController;
 use App\Http\Controllers\ProcedimentoController;
@@ -26,11 +28,19 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/pacientes/{id}', 'destroy')->name('pacientes.destroy');
         Route::get('paciente/{id}', 'show')->name('paciente.show');
     });
+    Route::controller(MarcaController::class)->group(function () {
+        Route::post('/marcas', 'store')->name('marcas.store');
+    });
+    Route::controller(CategoriaController::class)->group(function () {
+        Route::post('/categorias', 'store')->name('categorias.store');
+    });
 
     Route::controller(MedicamentoController::class)->group(function () {
         Route::get('/medicamentos', 'index')->name('medicamentos.index');
         Route::post('/medicamentos', 'store')->name('medicamentos.store');
         Route::put('/medicamentos', 'update')->name('medicamentos.update');
+        Route::put('/medicamentos/{id}/estoque', 'updateEstoque')->name('medicamentos.updateEstoque');
+
         Route::delete('/medicamentos/{id}', 'destroy')->name('medicamentos.destroy');
         Route::get('medicamento/{id}', 'show')->name('medicamento.show');
     });

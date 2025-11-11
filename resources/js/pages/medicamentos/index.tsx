@@ -1,17 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Head, router } from "@inertiajs/react";
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from "@/types";
 import { MedicamentoCard } from "@/pages/medicamentos/components/medicamento-card";
 import ModalCriar from "@/pages/medicamentos/components/modal-criar";
 import { Button } from "@/components/ui/button";
-import { Plus, Package, DollarSign, AlertTriangle, TrendingUp } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Plus,
+  Package,
+  DollarSign,
+  AlertTriangle,
+  Search,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Medicamento } from "@/models/Medicamento";
 import { confirmDialog } from "@/components/manual/dialog-events";
 
 interface MedicamentosIndexProps {
   medicamentos: Medicamento[];
+  marcas: { id: number; nome: string }[];
+  categorias: { id: number; nome: string }[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -21,9 +30,14 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function MedicamentosIndex({ medicamentos = [] }: MedicamentosIndexProps) {
+export default function MedicamentosIndex({
+  medicamentos = [],
+  marcas = [],
+  categorias = [],
+}: MedicamentosIndexProps) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [medicamentoSelecionado, setMedicamentoSelecionado] = useState<Medicamento | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleEdit = (medicamento: Medicamento) => {
     setMedicamentoSelecionado(medicamento);
@@ -53,21 +67,28 @@ export default function MedicamentosIndex({ medicamentos = [] }: MedicamentosInd
     setMedicamentoSelecionado(null);
   };
 
+  // 🔍 Filtragem
+  const filteredMedicamentos = useMemo(() => {
+    const term = searchTerm.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return medicamentos.filter((m) =>
+      m.nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(term)
+    );
+  }, [searchTerm, medicamentos]);
+
   // Estatísticas básicas
   const totalMedicamentos = medicamentos.length;
   const estoqueBaixo = medicamentos.filter((m) => m.estoque < 5).length;
   const valorTotal = medicamentos.reduce(
-    (acc, m) => acc + (Number(m.valor) * Number(m.estoque || 0)),
+    (acc, m) => acc + Number(m.valor) * Number(m.estoque || 0),
     0
   );
-  const novosEsteMes = Math.floor(totalMedicamentos * 0.1);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Medicamentos" />
       <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-6">
         {/* Header */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold">Medicamentos</h1>
             <p className="text-muted-foreground">
@@ -80,8 +101,19 @@ export default function MedicamentosIndex({ medicamentos = [] }: MedicamentosInd
           </Button>
         </div>
 
+        {/* Barra de Pesquisa */}
+        <div className="relative">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Pesquisar medicamento..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+
         {/* Cards de estatísticas */}
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Total de Medicamentos</CardTitle>
@@ -116,34 +148,25 @@ export default function MedicamentosIndex({ medicamentos = [] }: MedicamentosInd
               <p className="text-xs text-muted-foreground">valor total estimado</p>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Novos Este Mês</CardTitle>
-              <TrendingUp className="h-4 w-4 text-purple-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-purple-600">{novosEsteMes}</div>
-              <p className="text-xs text-muted-foreground">novos cadastros</p>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Lista */}
         <div className="flex-1">
-          {medicamentos.length === 0 ? (
+          {filteredMedicamentos.length === 0 ? (
             <div className="text-center py-12">
               <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">Nenhum medicamento encontrado</h3>
               <p className="text-muted-foreground">
-                Cadastre novos medicamentos para começar a gerenciar o estoque.
+                {searchTerm
+                  ? "Tente buscar por outro nome."
+                  : "Cadastre novos medicamentos para começar a gerenciar o estoque."}
               </p>
             </div>
           ) : (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-muted-foreground">Lista de Medicamentos</h2>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {medicamentos.map((medicamento) => (
+                {filteredMedicamentos.map((medicamento) => (
                   <MedicamentoCard
                     key={medicamento.id}
                     medicamento={medicamento}
@@ -162,6 +185,8 @@ export default function MedicamentosIndex({ medicamentos = [] }: MedicamentosInd
         open={isCreateModalOpen}
         setOpen={handleCloseModal}
         dado={medicamentoSelecionado}
+        categorias={categorias}
+        marcas={marcas}
       />
     </AppLayout>
   );

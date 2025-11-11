@@ -45,6 +45,29 @@ class FormatHandler {
 
     return `${day}/${month}/${year}`;
   };
+  formatMoneyInput = (value: number | string) => {
+    const num = Number(value) || 0;
+    return num.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  };
+
+  formatMoney = (value: string | number) => {
+    if (value === null || value === undefined) return "";
+
+    const num = typeof value === "string"
+      ? parseFloat(value.replace(/[^\d,.-]/g, "").replace(",", "."))
+      : value;
+
+    if (isNaN(num)) return "";
+
+    return num.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  };
+
 }
 
 export default new FormatHandler();
