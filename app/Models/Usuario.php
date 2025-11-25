@@ -16,6 +16,8 @@ class Usuario extends Authenticatable
     protected $fillable = [
         'nome',
         'password',
+        'pacientes_id',
+
     ];
 
     public function pacientes()

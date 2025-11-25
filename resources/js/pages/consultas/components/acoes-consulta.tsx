@@ -3,13 +3,15 @@ import { EllipsisItem } from "@/components/manual/ellipsis-item";
 import { EllipsisMenu } from "@/components/manual/ellipsis-menu";
 import { Usuario } from "@/models/Usuario";
 import { router } from "@inertiajs/react";
-import { BookOpen, FolderIcon, LogIn, Pencil, Trash2 } from "lucide-react";
+import { BookOpen, FolderIcon, LogIn, Pencil, Stethoscope, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 export default function AcoesConsulta({
   consulta,
+  onOpenEvolucao,
 }: {
   consulta: any;
+  onOpenEvolucao: Function | null;
 }) {
   const [open, setOpen] = useState(false); 
   return (
@@ -21,7 +23,15 @@ export default function AcoesConsulta({
           label="Editar"
           onClick={() => console.log("Editar", consulta)}
         />
-
+        <EllipsisItem
+          icon={Stethoscope}
+          label="Nova Evolução"
+          onClick={() => {
+            setOpen(false);
+            if (onOpenEvolucao) onOpenEvolucao(consulta);
+          }}
+        />
+        <hr className="my-1" />
         <EllipsisItem
           variant="destructive"
           label="Excluir"

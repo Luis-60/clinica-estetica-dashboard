@@ -14,16 +14,20 @@ class UsuarioSeeder extends Seeder
         Usuario::create([
             'nome' => 'admin',
             'password' => Hash::make('senha123'),
+            'role' => 'admin',  
+
         ]);
 
         Usuario::create([
             'nome' => 'Maria',
             'password' => Hash::make('senha123'),
+            'role' => 'user',
         ]);
 
         Usuario::create([
             'nome' => 'João',
             'password' => Hash::make('senha123'),
+            'role' => 'user',
         ]);
     }
 }

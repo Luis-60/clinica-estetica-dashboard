@@ -6,6 +6,8 @@ import { format } from "date-fns";
 import AppLayout from "@/layouts/app-layout";
 import ModalCriarConsulta from "./components/modal-criar-consulta";
 import AcoesConsulta from "./components/acoes-consulta";
+import ModalNovaEvolucao from "./components/modal-nova-evolucao";
+import { Procedimento } from "@/models/Procedimento";
 
 interface Paciente {
   id: number;
@@ -17,7 +19,7 @@ interface Consulta {
   paciente: Paciente;
   data_consulta: string;
   horario: string;
-  procedimento: string;
+  procedimento: Procedimento;
   observacoes?: string;
   created_at: string;
 }
@@ -29,9 +31,12 @@ export default function ConsultasPage({
 }: {
   pacientes?: Paciente[];
   consultas?: Consulta[];
-  procedimentos?: any[];
+  procedimentos?: Procedimento[];
 }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [evolucaoModalOpen, setEvolucaoModalOpen] = useState(false);
+  const [consultaSelecionada, setConsultaSelecionada] =
+    useState<Consulta | null>(null);
 
   // Definição das colunas da tabela
   const columns = [
@@ -69,7 +74,13 @@ export default function ConsultasPage({
       enableHiding: false,
       cell: ({ row }: any) => (
         <div className="flex gap-1 justify-end">
-          <AcoesConsulta consulta={row.original} />
+          <AcoesConsulta
+            consulta={row.original}
+            onOpenEvolucao={() => {
+              setConsultaSelecionada(row.original);
+              setEvolucaoModalOpen(true);
+            }}
+          />
         </div>
       ),
     },
@@ -92,6 +103,13 @@ export default function ConsultasPage({
           setOpen={setModalOpen}
           pacientes={pacientes}
           procedimentos={procedimentos}
+        />
+        <ModalNovaEvolucao
+          open={evolucaoModalOpen}
+          setOpen={setEvolucaoModalOpen}
+          pacientes={pacientes}
+          procedimentos={procedimentos}
+          consultaSelecionada={consultaSelecionada}
         />
       </div>
     </AppLayout>

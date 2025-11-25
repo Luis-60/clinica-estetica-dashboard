@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/manual/data-table";
 import { SortColumnButton } from "@/components/manual/sort-column-button";
-import { Evolucao } from "@/models/Evolucao";
+import { Eye, Edit, CalendarDays, Stethoscope } from "lucide-react";
 import formatHandler from "@/lib/formatHandler";
-import { Eye, Edit, Calendar, FileText } from "lucide-react";
-import ModalCriarEvolucao from "./modal-criar-evolucao";
+import { Consulta } from "@/models/Consulta";
+import ModalCriarConsulta from "./modal-criar-consulta";
 
 const initialVisibility = {
   pacientes_id: false,
@@ -16,9 +16,9 @@ const initialVisibility = {
 };
 
 const createColumns = (
-  onEdit: (evolucao: Evolucao) => void,
+  onEdit: (consulta: Consulta) => void,
   isReadOnly: boolean
-): ColumnDef<Evolucao>[] => [
+): ColumnDef<Consulta>[] => [
   {
     accessorKey: "data",
     header: ({ column }) => <SortColumnButton nome="Data" column={column} />,
@@ -26,14 +26,12 @@ const createColumns = (
       const data = row.getValue("data") as string;
       return (
         <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-muted-foreground" />
+          <CalendarDays className="h-4 w-4 text-muted-foreground" />
           <span>{formatHandler.formatDate(data)}</span>
         </div>
       );
     },
-    meta: {
-      displayName: "Data",
-    },
+    meta: { displayName: "Data" },
   },
   {
     accessorKey: "procedimento",
@@ -42,7 +40,6 @@ const createColumns = (
     ),
     cell: ({ row }) => {
       const procedimento = row.original.procedimento;
-
       return (
         <div className="max-w-[300px]">
           <p className="font-medium text-sm truncate">
@@ -51,33 +48,10 @@ const createColumns = (
         </div>
       );
     },
-    meta: {
-      displayName: "Procedimento",
-    },
+    meta: { displayName: "Procedimento" },
   },
   {
-    accessorKey: "observacoes",
-    header: ({ column }) => (
-      <SortColumnButton nome="Observações" column={column} />
-    ),
-    cell: ({ row }) => {
-      const observacoes = row.getValue("observacoes") as string;
-      if (!observacoes) {
-        return <span className="text-muted-foreground text-sm">-</span>;
-      }
-      return (
-        <div className="max-w-[250px]">
-          <p className="text-sm truncate" title={observacoes}>
-            {observacoes}
-          </p>
-        </div>
-      );
-    },
-    meta: {
-      displayName: "Observações",
-    },
-  },
-  {
+    meta: { displayName: "Criado em" },
     accessorKey: "created_at",
     header: ({ column }) => (
       <SortColumnButton nome="Criado em" column={column} />
@@ -85,13 +59,10 @@ const createColumns = (
     cell: ({ row }) => {
       const created_at = row.getValue("created_at") as string;
       return (
-        <div className="text-sm text-muted-foreground">
+        <span className="text-sm text-muted-foreground">
           {formatHandler.formatDate(created_at)}
-        </div>
+        </span>
       );
-    },
-    meta: {
-      displayName: "Criado em",
     },
   },
   {
@@ -99,22 +70,25 @@ const createColumns = (
     enableHiding: false,
     header: "Ações",
     cell: ({ row }) => {
-      const evolucao = row.original;
+      const consulta = row.original;
+
       return (
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              console.log("Ver evolução:", evolucao.id);
-            }}
+            onClick={() => console.log("Ver consulta:", consulta.id)}
           >
             <Eye className="h-4 w-4 mr-1" />
             Ver
           </Button>
-          
+
           {!isReadOnly && (
-            <Button variant="outline" size="sm" onClick={() => onEdit(evolucao)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onEdit(consulta)}
+            >
               <Edit className="h-4 w-4 mr-1" />
               Editar
             </Button>
@@ -126,65 +100,63 @@ const createColumns = (
 ];
 
 interface Props {
-  evolucoes: Evolucao[];
+  consultas: Consulta[];
   pacienteId: number;
   procedimentos: any[];
   isReadOnly: boolean;
 }
 
-export default function EvolucaoTable({
-  evolucoes,
+export default function ConsultaTable({
+  consultas,
   pacienteId,
   procedimentos,
   isReadOnly,
 }: Props) {
   const [modalOpen, setModalOpen] = useState(false);
-  const [evolucaoEditando, setEvolucaoEditando] = useState<Evolucao | null>(
+  const [consultaEditando, setConsultaEditando] = useState<Consulta | null>(
     null
   );
 
-  const handleNovaEvolucao = () => {
-    setEvolucaoEditando(null);
+  const handleNovaConsulta = () => {
+    setConsultaEditando(null);
     setModalOpen(true);
   };
 
-  const handleEditarEvolucao = (evolucao: Evolucao) => {
-    setEvolucaoEditando(evolucao);
+  const handleEditarConsulta = (consulta: Consulta) => {
+    setConsultaEditando(consulta);
     setModalOpen(true);
   };
 
-  const columns = createColumns(handleEditarEvolucao, isReadOnly);
+  const columns = createColumns(handleEditarConsulta, isReadOnly);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <FileText className="h-5 w-5" />
-          <h3 className="text-lg font-semibold">Evoluções do Paciente</h3>
-          <Badge variant="secondary" className="ml-2">
-            {evolucoes.length} registros
-          </Badge>
+          <Stethoscope className="h-5 w-5" />
+          <h3 className="text-lg font-semibold">Consultas do Paciente</h3>
+          <Badge variant="secondary">{consultas.length} registros</Badge>
         </div>
-        
+
         {!isReadOnly && (
-          <Button onClick={handleNovaEvolucao}>
-            <FileText className="h-4 w-4 mr-2" />
-            Nova Evolução
+          <Button onClick={handleNovaConsulta}>
+            <Stethoscope className="h-4 w-4 mr-2" />
+            Nova Consulta
           </Button>
         )}
       </div>
 
       <DataTable
         columns={columns}
-        data={evolucoes}
+        data={consultas}
         initialColumnVisibility={initialVisibility}
       />
 
-      <ModalCriarEvolucao
+      <ModalCriarConsulta
         open={modalOpen}
         setOpen={setModalOpen}
         pacienteId={pacienteId}
-        dado={evolucaoEditando}
+        dado={consultaEditando}
         procedimentos={procedimentos}
       />
     </div>

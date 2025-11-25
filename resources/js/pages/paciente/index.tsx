@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Head, Link, router } from "@inertiajs/react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import { Paciente } from "@/models/Paciente";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,12 +38,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Procedimento } from "@/models/Procedimento";
+import ConsultaTable from "./components/consulta";
 
 interface Props {
   paciente: Paciente;
   consultas?: any[];
   evolucoes?: Evolucao[];
   fichas?: FichaAnamnese[];
+  procedimentos?: Procedimento[];
 }
 
 export default function PacienteShow({
@@ -51,6 +54,7 @@ export default function PacienteShow({
   consultas = [],
   evolucoes = [],
   fichas = [],
+  procedimentos = [],
 }: Props) {
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -62,7 +66,9 @@ export default function PacienteShow({
       href: `/pacientes/${paciente.id}`,
     },
   ];
+
   const [fichaCardOpen, setFichaCardOpen] = useState(false);
+
   const formatDateTime = (dateString: string) => {
     try {
       return new Date(dateString).toLocaleString("pt-BR");
@@ -70,6 +76,10 @@ export default function PacienteShow({
       return dateString;
     }
   };
+  const { auth } = usePage().props as any;
+  const isReadOnly = auth.user.role !== "admin";
+
+  console.log(evolucoes);
 
   const calcularIdade = (dataNasc: string) => {
     const hoje = new Date();
@@ -87,6 +97,7 @@ export default function PacienteShow({
   const handleEdit = () => {
     router.visit(`/pacientes/${paciente.id}/edit`);
   };
+
   const handleDelete = (id: number) => {
     confirmDialog({
       title: "Excluir Paciente",
@@ -101,6 +112,20 @@ export default function PacienteShow({
       },
     });
   };
+  if (!auth) {
+    return (
+      <AppLayout breadcrumbs={breadcrumbs}>
+        <Head title={`Paciente - ${paciente.nome}`} />
+        <div className="p-4 flex justify-center items-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-2 text-muted-foreground">Carregando...</p>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <>
       <AppLayout breadcrumbs={breadcrumbs}>
@@ -125,8 +150,10 @@ export default function PacienteShow({
                 <Edit className="h-4 w-4 mr-2" />
                 Editar
               </Button>
-              <Button variant="destructive" 
-                onClick={() => handleDelete(paciente.id)}>
+              <Button
+                variant="destructive"
+                onClick={() => handleDelete(paciente.id)}
+              >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Excluir
               </Button>
@@ -134,8 +161,11 @@ export default function PacienteShow({
           </div>
 
           {/* Accordion Principal */}
-          <Accordion type="multiple" defaultValue={["informacoes", "resumo", "fichas", "evolucoes"]} className="w-full">
-            
+          <Accordion
+            type="multiple"
+            defaultValue={["informacoes", "resumo", "fichas", "evolucoes"]}
+            className="w-full"
+          >
             {/* Informações Pessoais */}
             <AccordionItem value="informacoes" className="pt-3">
               <AccordionTrigger className="font-semibold text-foreground/90 hover:no-underline">
@@ -144,6 +174,7 @@ export default function PacienteShow({
                   Informações Pessoais
                 </div>
               </AccordionTrigger>
+
               <AccordionContent>
                 <Card className="w-full">
                   <CardContent className="space-y-4">
@@ -190,7 +221,9 @@ export default function PacienteShow({
                           ) : (
                             <Mars className="h-4 w-4 text-blue-500" />
                           )}
-                          <p className="text-base capitalize">{paciente.sexo}</p>
+                          <p className="text-base capitalize">
+                            {paciente.sexo}
+                          </p>
                         </div>
                       </div>
 
@@ -229,6 +262,7 @@ export default function PacienteShow({
                   Resumo do Paciente
                 </div>
               </AccordionTrigger>
+
               <AccordionContent>
                 <div className="flex flex-col lg:flex-row gap-6 w-full">
                   {/* Status e Resumo */}
@@ -253,14 +287,18 @@ export default function PacienteShow({
                           <span className="text-sm text-muted-foreground">
                             Consultas
                           </span>
-                          <span className="font-medium">{consultas.length}</span>
+                          <span className="font-medium">
+                            {consultas.length}
+                          </span>
                         </div>
 
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-muted-foreground">
                             Evoluções
                           </span>
-                          <span className="font-medium">{evolucoes.length}</span>
+                          <span className="font-medium">
+                            {evolucoes.length}
+                          </span>
                         </div>
 
                         <div className="flex items-center justify-between">
@@ -301,7 +339,7 @@ export default function PacienteShow({
                         <CardContent>
                           <div className="space-y-2">
                             <p className="text-sm text-muted-foreground">
-                              {formatDateTime(consultas[0]?.data_consulta || "")}
+                              {formatDateTime(consultas[0]?.data || "")}
                             </p>
                             <p className="text-sm">
                               {consultas[0]?.observacoes || "Sem observações"}
@@ -337,6 +375,24 @@ export default function PacienteShow({
               </AccordionContent>
             </AccordionItem>
 
+            {/* Consultas */}
+            <AccordionItem value="consultas" className="pt-3">
+              <AccordionTrigger className="font-semibold text-foreground/90 hover:no-underline">
+                <div className="flex items-center gap-2">
+                  <Stethoscope className="h-5 w-5" />
+                  Consultas ({consultas.length})
+                </div>
+              </AccordionTrigger>
+
+              <AccordionContent>
+                <ConsultaTable
+                  consultas={consultas}
+                  pacienteId={paciente.id}
+                  procedimentos={procedimentos}
+                  isReadOnly={isReadOnly}
+                />
+              </AccordionContent>
+            </AccordionItem>
 
             {/* Evoluções */}
             <AccordionItem value="evolucoes" className="pt-3">
@@ -346,8 +402,14 @@ export default function PacienteShow({
                   Evoluções ({evolucoes.length})
                 </div>
               </AccordionTrigger>
+
               <AccordionContent>
-                <EvolucaoTable evolucoes={evolucoes} pacienteId={paciente.id} />
+                <EvolucaoTable
+                  evolucoes={evolucoes}
+                  pacienteId={paciente.id}
+                  procedimentos={procedimentos}
+                  isReadOnly={isReadOnly}
+                />
               </AccordionContent>
             </AccordionItem>
 
@@ -359,6 +421,7 @@ export default function PacienteShow({
                   Fichas de Anamnese ({fichas.length})
                 </div>
               </AccordionTrigger>
+
               <AccordionContent>
                 <div className="flex justify-between items-center mb-4">
                   <Button
@@ -368,18 +431,18 @@ export default function PacienteShow({
                     Adicionar Ficha
                   </Button>
                 </div>
-                
+
                 {/* Lista de fichas existentes */}
-                <FichaAnamneseList 
+                <FichaAnamneseList
                   fichas={fichas}
                   onCreateNew={() => setFichaCardOpen(true)}
                   onViewDetails={(ficha) => {
                     // TODO: Implementar visualização detalhada da ficha
-                    console.log('Ver detalhes da ficha:', ficha.id);
+                    console.log("Ver detalhes da ficha:", ficha.id);
                   }}
                   onEdit={(ficha) => {
                     // TODO: Implementar edição da ficha
-                    console.log('Editar ficha:', ficha.id);
+                    console.log("Editar ficha:", ficha.id);
                   }}
                 />
               </AccordionContent>

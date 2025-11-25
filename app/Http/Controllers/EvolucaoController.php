@@ -12,13 +12,21 @@ final class EvolucaoController extends Controller
     {
         $validated = $request->validate([
             'data' => 'required|date',
-            'procedimento' => 'required|string|max:500',
+            'procedimentos_id' => 'required|integer|exists:procedimentos,id',
             'observacoes' => 'nullable|string',
             'pacientes_id' => 'required|integer|exists:pacientes,id',
         ]);
 
         try {
-            Evolucao::create($validated);
+
+        // Create the event
+        Evolucao::create([
+            'data' => $validated['data'],
+            'procedimentos_id' => $validated['procedimentos_id'],
+            'pacientes_id' => $validated['pacientes_id'],
+            'observacoes' => $validated['observacoes'],
+        ]);
+
 
             return redirect()->back()->with('success', 'Evolução criada com sucesso!');
         } catch (\Throwable $th) {
@@ -30,7 +38,7 @@ final class EvolucaoController extends Controller
     {
         $validated = $request->validate([
             'data' => 'required|date',
-            'procedimento' => 'required|string|max:500',
+            'procedimentos_id' => 'required|integer|exists:procedimentos,id',
             'observacoes' => 'nullable|string',
         ]);
 

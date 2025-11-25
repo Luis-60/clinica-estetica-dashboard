@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Paciente;
+use App\Models\Usuario;
+use App\Models\Procedimento;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Validation\Rule;
@@ -30,6 +32,12 @@ final class PacienteController extends Controller
         ]);
 
         try {
+            $usuario = Usuario::create(
+                [
+                    'nome' => $validated['nome'],
+                    'password' => bcrypt('senha123'),
+                ]
+            );
             $paciente = Paciente::create([
                 'nome' => $validated['nome'],
                 'data_nasc' => $validated['data_nasc'],
@@ -37,8 +45,9 @@ final class PacienteController extends Controller
                 'telefone' => $validated['telefone'],
                 'sexo' => $validated['sexo'],
                 'rede_social' => $validated['rede_social'],
-                'usuarios_id' => auth()->id(), // Associa ao usuário logado
             ]);
+
+            $usuario->update(['pacientes_id' => $paciente->id]);
 
             return redirect()->back()->with('success', 'Paciente cadastrado com sucesso!');
         } catch (\Throwable $th) {
@@ -86,13 +95,15 @@ final class PacienteController extends Controller
     }
     public function show($id): Response
     {
-        $paciente = Paciente::with(['consultas', 'evolucoes', 'fichasAnamnese'])->findOrFail($id);
+        $procedimentos = Procedimento::all();
+        $paciente = Paciente::with(['consultas.procedimento', 'evolucoes.procedimento', 'fichasAnamnese'])->findOrFail($id);
 
         return inertia('paciente/index', [
             'paciente' => $paciente,
             'consultas' => $paciente->consultas ?? [],
             'evolucoes' => $paciente->evolucoes ?? [],
             'fichas' => $paciente->fichasAnamnese ?? [],
+            'procedimentos' => $procedimentos,
         ]);
     }
 }

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->index('pacientes_id');
             $table->foreign('pacientes_id')->references('id')->on('pacientes')->onDelete('cascade');
             $table->datetime('data');
+            $table->boolean('concluido')->default(false);
             $table->unsignedBigInteger('procedimentos_id');
             $table->index('procedimentos_id');
             $table->foreign('procedimentos_id')->references('id')->on('procedimentos')->onDelete('cascade');

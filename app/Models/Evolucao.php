@@ -11,7 +11,7 @@ class Evolucao extends Model
     protected $table = 'evolucoes';
     protected $fillable = [
         'data',
-        'procedimento',
+        'procedimentos_id',
         'observacoes',
         'pacientes_id',
     ];
@@ -19,5 +19,9 @@ class Evolucao extends Model
     public function paciente()
     {
         return $this->belongsTo(Paciente::class, 'pacientes_id');
+    }
+    public function procedimento()
+    {
+        return $this->belongsTo(Procedimento::class, 'procedimentos_id');
     }
 }

@@ -15,7 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('nome');
             $table->string('password');
+            $table->enum('role', ['admin', 'user'])->default('user');
             $table->string('remember_token')->nullable();
+
+            $table->unsignedBigInteger('pacientes_id')->nullable();
+            $table->index('pacientes_id');
+            $table->foreign('pacientes_id')->references('id')->on('pacientes')->onDelete('set null');
+
             $table->timestamps();
         });
     }

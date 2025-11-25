@@ -4,14 +4,12 @@ import { Link, usePage } from '@inertiajs/react';
 import { Ripple } from 'primereact/ripple';
 interface NavMainProps {
     items?: NavItem[];
-    orientador?: NavItem[];
-    administrador?: NavItem[];
-    coordenador?: NavItem[];
-    avaliador?: NavItem[];
+    admin?: NavItem[];
+    user?: NavItem[];
     configuracoes?: NavItem[];
 }
 
-export function NavMain({ items = [], avaliador = [], administrador = [], configuracoes = [], orientador = [], coordenador = [] }: NavMainProps) {
+export function NavMain({ items = [], admin = [], user = [], configuracoes = [] }: NavMainProps) {
     const page = usePage();
 
     const renderGroup = (label: string, groupItems: NavItem[]) => {
@@ -49,10 +47,8 @@ export function NavMain({ items = [], avaliador = [], administrador = [], config
         <>
             {/* Grupo principal */}
             {renderGroup('Menu', items)}
-            {renderGroup('Administrador', administrador)}
-            {renderGroup('Coordenador', coordenador)}
-            {renderGroup('Orientador', orientador)}
-            {renderGroup('Avaliador', avaliador)}
+            {renderGroup('Administrador', admin)}
+            {renderGroup('Usuário', user)}
             {renderGroup('Configurações', configuracoes)}
         </>
     );

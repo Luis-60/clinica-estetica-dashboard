@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Consulta;
+use App\Models\Paciente;
+use App\Models\Procedimento;
 use Illuminate\Http\Request;
 use Inertia\Response;
 use Carbon\Carbon;
@@ -12,8 +14,8 @@ class ConsultaController extends Controller
     public function index(): Response
     {
         $consultas = Consulta::with(['paciente', 'procedimento'])->latest()->get();
-        $pacientes = \App\Models\Paciente::all();
-        $procedimentos = \App\Models\Procedimento::all();
+        $pacientes = Paciente::all();
+        $procedimentos = Procedimento::all();
 
         return inertia('consultas/index', [
             'consultas' => $consultas,

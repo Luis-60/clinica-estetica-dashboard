@@ -10,16 +10,16 @@ use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\FichaAnamneseController;
 use App\Http\Controllers\ConsultaController;
 use App\Http\Controllers\ProcedimentoController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
+
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('menu', [
-        ]);
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
     Route::controller(PacienteController::class)->group(function () {
         Route::get('/pacientes', 'index')->name('pacientes.index');

@@ -15,6 +15,7 @@ class Consulta extends Model
         'pacientes_id',
         'procedimentos_id',
         'data',
+        'concluido', 
     ];
 
     public function paciente()

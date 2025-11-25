@@ -3,7 +3,7 @@ import Field from "@/components/manual/field";
 import ModalBase from "@/components/manual/modal-base";
 import SubmitButton from "@/components/manual/submit-button";
 import { Label } from "@/components/ui/label";
-import { Evolucao } from "@/models/Evolucao";
+import { Consulta } from "@/models/Consulta";
 import { useForm } from "@inertiajs/react";
 import { useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,13 +12,19 @@ interface Props {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   pacienteId: number;
-  dado?: Evolucao | null;
+  dado?: Consulta | null;
   procedimentos: any[];
 }
 
-export default function ModalCriarEvolucao({ open, setOpen, pacienteId, dado, procedimentos }: Props) {
+export default function ModalCriarConsulta({
+  open,
+  setOpen,
+  pacienteId,
+  dado,
+  procedimentos,
+}: Props) {
   useEffect(() => {
-    if (open === false) {
+    if (!open) {
       reset();
       clearErrors();
     }
@@ -29,18 +35,16 @@ export default function ModalCriarEvolucao({ open, setOpen, pacienteId, dado, pr
       id: dado?.id ?? 0,
       data: dado?.data ?? "",
       procedimentos_id: dado?.procedimentos_id ?? "",
-      observacoes: dado?.observacoes ?? "",
       pacientes_id: pacienteId,
     };
   }
 
-  const { data, setData, post, put, processing, errors, clearErrors, reset } =
+  const { data, setData, post, put, processing, errors, reset, clearErrors } =
     useForm<
       Required<{
         id: number;
         data: string;
         procedimentos_id: number | string;
-        observacoes: string;
         pacientes_id: number;
       }>
     >(newForm());
@@ -53,45 +57,36 @@ export default function ModalCriarEvolucao({ open, setOpen, pacienteId, dado, pr
     e.preventDefault();
 
     if (data.id !== 0) {
-      put(route("evolucoes.update", data.id), {
+      put(route("consultas.update", data.id), {
         preserveScroll: true,
-        onSuccess: () => {
-          setOpen(false);
-        },
-        onError: (errors) => {
-          console.error(JSON.stringify(errors));
-        },
+        onSuccess: () => setOpen(false),
       });
       return;
     }
 
-    post(route("evolucoes.store"), {
+    post(route("consultas.store"), {
       preserveScroll: true,
-      onSuccess: () => {
-        setOpen(false);
-      },
-      onError: (errors) => {
-        console.error(JSON.stringify(errors));
-      },
+      onSuccess: () => setOpen(false),
     });
   };
 
   return (
-    <ModalBase 
-      open={open} 
-      setOpen={setOpen} 
-      titulo={dado ? "Editar Evolução" : "Nova Evolução"}
+    <ModalBase
+      open={open}
+      setOpen={setOpen}
+      titulo={dado ? "Editar Consulta" : "Nova Consulta"}
     >
       <form onSubmit={handleSubmit}>
         <div className="grid gap-4">
+          {/* DATA */}
           <div>
-            <Label>Data da Evolução</Label>
+            <Label>Data da Consulta</Label>
             <DatePicker
               value={data.data}
               onChange={(date) => {
                 if (date instanceof Date && !isNaN(date.getTime())) {
                   const dateString = date.toISOString().split("T")[0];
-                  setData({ ...data, data: dateString });
+                  setData("data", dateString);
                 }
               }}
             />
@@ -100,6 +95,7 @@ export default function ModalCriarEvolucao({ open, setOpen, pacienteId, dado, pr
             )}
           </div>
 
+          {/* PROCEDIMENTO */}
           <Field label="Procedimento">
             <select
               className="w-full rounded border px-2 py-1"
@@ -107,39 +103,29 @@ export default function ModalCriarEvolucao({ open, setOpen, pacienteId, dado, pr
               onChange={(e) => setData("procedimentos_id", e.target.value)}
             >
               <option value="">Selecione o procedimento...</option>
+
               {procedimentos.map((proc: any) => (
-                <option key={proc.id ?? proc.nome} value={proc.id}>
+                <option key={proc.id} value={proc.id}>
                   {proc.nome}
                 </option>
               ))}
             </select>
+
             {errors.procedimentos_id && (
-              <div className="text-destructive text-sm">{errors.procedimentos_id}</div>
+              <p className="text-destructive text-sm mt-1">
+                {errors.procedimentos_id}
+              </p>
             )}
           </Field>
 
-
-          <div>
-            <Label htmlFor="observacoes">Observações</Label>
-            <Textarea
-              id="observacoes"
-              placeholder="Digite observações sobre a evolução do paciente..."
-              value={data.observacoes}
-              onChange={(e) => {
-                setData({ ...data, observacoes: e.target.value });
-              }}
-              className="mt-2 min-h-[100px]"
-            />
-            {errors.observacoes && (
-              <p className="text-red-500 text-sm mt-1">{errors.observacoes}</p>
-            )}
-          </div>
+          {/* OBSERVAÇÕES */}
+          
         </div>
 
-        <div className="grid grid-flow-col mt-6 ml-auto gap-3">
+        <div className="flex justify-end mt-6">
           <SubmitButton
             processing={processing}
-            label={dado ? "Salvar Alterações" : "Criar Evolução"}
+            label={dado ? "Salvar Alterações" : "Criar Consulta"}
           />
         </div>
       </form>
